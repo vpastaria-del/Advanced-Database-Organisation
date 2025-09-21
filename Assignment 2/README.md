@@ -123,9 +123,32 @@ The page replacement strategy functions implement FIFO, LRU, LFU, CLOCK algorith
 -------------------------------------------------------------------------------------------
 
 ### How to Run (FOR WINDOWS) :
+-  Pre-requsisite : MinGW should be installed in the system.
 
+Step 1 : Open the Command Prompt/Terminal.
 
+Step 2 : Navigate to the downloaded directory.
 
+Step 3 : Type command 'mingw32-make' and enter(Files are compiled and ready to be executed).
+
+Step 4 : Type command 'test1.exe'.
+
+Step 5 : Type command 'test2.exe'.
+
+---------------------------------------------------------------------------------------------
+### How to Run (FOR macOS) :
+
+Step 1 : Open the Command Prompt/Terminal.
+
+Step 2 : Navigate to the downloaded directory in the terminal.
+
+Step 3 : Type command 'make' and enter(Files are compiled and ready to be executed).
+
+Step 4 : Type command './test1'.
+
+Step 5 : Type command './test2'.
+
+---------------------------------------------------------------------------------------------
 
 Loom url: https://www.loom.com/share/74254f07524e4310b5272c39fd646a4c?sid=88e4d201-0b97-4f30-a594-4ac22a9ec7a5
 
