@@ -37,7 +37,6 @@ static PoolMgmt *mgmt(BM_BufferPool *const bm) {
 }
 
 static int findFrameIndexByPage(PoolMgmt *pm, PageNumber p) {
-    // simple linear scan
     for (int i = 0; i < pm->capacity; i++) {
         if (pm->frames[i].pageNum == p) {
             return i;
@@ -143,7 +142,7 @@ static void touchForLRU(PoolMgmt *pm, Frame *fr) {
 RC initBufferPool(BM_BufferPool *const bm, const char *const pageFileName,
                   const int numPages, ReplacementStrategy strategy,
                   void *stratData) {
-    (void)stratData; // not used for FIFO/LRU
+    (void)stratData; 
     if (bm == NULL || pageFileName == NULL || numPages <= 0) return RC_FILE_HANDLE_NOT_INIT;
 
     PoolMgmt *pm = (PoolMgmt*)calloc(1, sizeof(PoolMgmt));
@@ -163,7 +162,7 @@ RC initBufferPool(BM_BufferPool *const bm, const char *const pageFileName,
         return RC_FILE_HANDLE_NOT_INIT;
     }
 
-    // allocate backing storage for each frame; use 1-based addressing to match provided printers
+    // allocate backing storage for each frame
     for (int i = 0; i < numPages; i++) {
         pm->frames[i].data = (char*)malloc(PAGE_SIZE + 1);
         if (pm->frames[i].data == NULL) {
@@ -198,7 +197,7 @@ RC shutdownBufferPool(BM_BufferPool *const bm) {
     if (bm == NULL || bm->mgmtData == NULL) return RC_FILE_HANDLE_NOT_INIT;
     PoolMgmt *pm = mgmt(bm);
 
-    // Flush only unpinned dirty frames; allow shutdown even if some pages remain pinned
+    // Flush only unpinned dirty frames
     for (int i = 0; i < pm->capacity; i++) {
         Frame *fr = &pm->frames[i];
         if (fr->pageNum != NO_PAGE && fr->dirty && fr->fixCount == 0) {
@@ -254,12 +253,9 @@ RC unpinPage(BM_BufferPool *const bm, BM_PageHandle *const page) {
     PoolMgmt *pm = mgmt(bm);
     int idx = findFrameIndexByPage(pm, page->pageNum);
     if (idx < 0) return RC_READ_NON_EXISTING_PAGE;
-
-    // student: just decrement if positive
     if (pm->frames[idx].fixCount > 0) {
         pm->frames[idx].fixCount -= 1;
     }
-    // touching LRU on unpin is optional; keep it simple and don't bump here
     return RC_OK;
 }
 
@@ -288,20 +284,15 @@ RC pinPage(BM_BufferPool *const bm, BM_PageHandle *const page,
         page->data = fr->data + 1;
         return RC_OK;
     }
-
-    // Not cached: try to find an empty frame first
+    // Not cached
     idx = findEmptyFrameIndex(pm);
-
-    // If no empty frame, select a victim according to strategy
     if (idx < 0) {
         idx = pickVictim(pm, bm->strategy);
         if (idx < 0) {
             // No evictable frame (all pinned)
-            return RC_WRITE_FAILED; // reuse error code to signal inability to pin
+            return RC_WRITE_FAILED; 
         }
     }
-
-    // Evict if needed and load requested page
     RC rcLoad = evictIfNeededAndLoad(pm, idx, pageNum);
     if (rcLoad != RC_OK) return rcLoad;
 
